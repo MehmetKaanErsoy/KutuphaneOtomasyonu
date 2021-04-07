@@ -208,7 +208,6 @@ class kitap_listele(QWidget):
         self.listeli.setGeometry(547, 328, 450, 240)
         self.listeli.itemClicked.connect(self.clicked)
         self.liste.itemClicked.connect(self.clicked)
-
         self.delete = QPushButton("Sil", self)
         self.delete.setFont(label)
         self.delete.setGeometry(670, 600, 170, 60)
@@ -226,16 +225,16 @@ class kitap_listele(QWidget):
 
     def clicked(self, item):
         kitapismi = item.text()
-        kontrol = etiket.execute("Select * from kitaplar WHERE Kitapadi = ?", (kitapismi,))
+        kontrol = etiket.execute("Select * from kitaplar WHERE Kitapadi = ?",(kitapismi,))
         durum = kontrol.fetchall()[0][0]
 
     def sil(self):
         cevap = QMessageBox.question(kitap_listele(), "Kayıt Sil", "Kitabı silmek istediğinize eminmisiniz?", \
                                      QMessageBox.Yes | QMessageBox.No)
         if cevap == QMessageBox.Yes:
-            secili = self.liste.selectedItems()
-            silinecek = secili[0].text()
-            etiket.execute("Delete FROM kitaplar WHERE Kitapadi='%s'" % (silinecek))
+            self.secili = self.listeli.selectedItems()
+            self.silinecek = self.secili[0].text()
+            etiket.execute("Delete FROM kitaplar WHERE Kitapadi= ?",(self.silinecek,))
             baglanti.commit()
 
     def kitap_sorgu_emanet(self):
@@ -438,9 +437,9 @@ class uye_listele(QWidget):
         cevap = QMessageBox.question(kitap_listele(), "Kayıt Sil", "Kitabı silmek istediğinize eminmisiniz?", \
                                      QMessageBox.Yes | QMessageBox.No)
         if cevap == QMessageBox.Yes:
-            secili = self.aramasonuc.selectedItems()
-            silinecek = secili[0].text()
-            etiket.execute("Delete FROM uyeler WHERE kullaniciId='%s'" % (silinecek))
+            self.secili = self.aramasonuc.selectedItems()
+            self.silinecek = self.secili[0].text()
+            etiket.execute("Delete FROM uyeler WHERE kullaniciId='%s'" % (self.silinecek,))
             baglanti.commit()
 
     def __init__(self):
@@ -549,7 +548,7 @@ class emanet_ekle(QWidget):
         fetch = etiket.execute("Select kim_aldi FROM emanetler WHERE kim_aldi = '%s'" % sec)
         for i in fetch.fetchall():
             if sec == i[0]:
-                QMessageBox.about(self, "Bilgilendirme", i[0] + " isimli üyede zaten bir adet kitap mevcut !")
+                QMessageBox.information(self, "Bilgilendirme", i[0] + " isimli üyede zaten bir adet kitap mevcut !")
                 baglanti.commit()
                 self.close()
 
